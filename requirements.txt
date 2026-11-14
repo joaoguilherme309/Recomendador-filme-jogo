@@ -7,6 +7,9 @@ python-multipart>=0.0.12
 # Banco de Dados (SQLite + ORM)
 sqlalchemy>=2.0.0
 
+# Download dos datasets originais
+huggingface_hub>=0.24.0
+
 # Processamento de Dados e NLP
 pandas>=2.2.0
 numpy>=1.26.4
