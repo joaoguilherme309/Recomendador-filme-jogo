@@ -1,0 +1,25 @@
+# Ambientes virtuais
+.venv/
+venv/
+
+# Arquivos temporários Python
+__pycache__/
+*.pyc
+
+# Datasets
+data/
+steam-games-dataset-main/
+tmdb_top_10k_movies_2026.csv.csv
+
+# Modelos gerados
+models/*.pkl
+models/*.joblib
+
+# Configurações locais
+.env
+.env.*
+!.env.example
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
