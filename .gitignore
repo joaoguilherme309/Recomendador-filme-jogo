@@ -13,9 +13,13 @@ data/
 steam-games-dataset-main/
 tmdb_top_10k_movies_2026.csv.csv
 
-# Modelos gerados
+# Modelos gerados (o artefato vetorizado é regenerado pelo pipeline;
+# o manifesto.json fica versionado para registrar de onde ele veio)
 models/*.pkl
 models/*.joblib
+artefatos/**/*.joblib
+artefatos/**/*.npz
+artefatos/*.tmp/
 
 # Configurações locais
 .env
