@@ -1,21 +1,26 @@
+# Análise exploratória dos datasets originais (somente leitura, em data/raw/).
+# Baixe-os antes com: python scripts/baixar_datasets.py
 
-import json
+import sys
 import pandas as pd
 from pathlib import Path
 
 # Diretório principal do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BASE_DIR))
+from backend.config import DATASETS, caminho_bruto  # noqa: E402
 
 # ==========================================
 # 1. ANÁLISE DO DATASET DE FILMES
 # ==========================================
 
-caminho_filmes = BASE_DIR / "data" / "tmdb_top_10k_movies_2026.csv.csv"
+caminho_filmes = caminho_bruto("filmes")
 
 # Carregar dataset
 filmes = pd.read_csv(caminho_filmes)
 
 print("\n=== DATASET DE FILMES ===")
+print(f"Fonte: {DATASETS['filmes']['repo_id']}")
 
 print(f"\nQuantidade de filmes: {len(filmes)}")
 
@@ -32,45 +37,22 @@ print(filmes.isnull().sum())
 # 2. ANÁLISE DO DATASET DE JOGOS
 # ==========================================
 
-caminho_jogos = BASE_DIR / "data" / "games_sample10.json"
+caminho_jogos = caminho_bruto("jogos")
 
-# Carregar dataset
-with open(caminho_jogos, "r", encoding="utf-8") as arquivo:
-    jogos = json.load(arquivo)
+# O cabeçalho original junta duas colunas ("DiscountDLC count"); corrige só na leitura
+colunas = pd.read_csv(caminho_jogos, nrows=0).columns.tolist()
+if "DiscountDLC count" in colunas:
+    indice = colunas.index("DiscountDLC count")
+    colunas[indice : indice + 1] = ["Discount", "DLC count"]
+
+jogos = pd.read_csv(
+    caminho_jogos, header=0, names=colunas, index_col=False, low_memory=False
+)
 
 print("\n=== DATASET DE JOGOS ===")
+print(f"Fonte: {DATASETS['jogos']['repo_id']}")
 
-print(f"\nTipo de estrutura: {type(jogos).__name__}")
-
-if isinstance(jogos, dict):
-    print(f"\nQuantidade de jogos: {len(jogos)}")
-
-    print("\nPrimeiras chaves:")
-    print(list(jogos.keys())[:5])
-
-    if jogos:
-        primeiro_jogo = next(iter(jogos.values()))
-
-        print("\nExemplo de um jogo:")
-        print(json.dumps(
-            primeiro_jogo,
-            indent=2,
-            ensure_ascii=False
-        )[:3000])
-
-elif isinstance(jogos, list):
-    print(f"\nQuantidade de jogos: {len(jogos)}")
-
-    if jogos:
-        print("\nExemplo de um jogo:")
-        print(json.dumps(
-            jogos[0],
-            indent=2,
-            ensure_ascii=False
-        )[:3000])
-
-else:
-    print("\nFormato de JSON não esperado.")
+print(f"\nQuantidade de jogos: {len(jogos)}")
 
 # ==========================================
 # 3. IDENTIFICAR OS CAMPOS DOS JOGOS
@@ -78,20 +60,19 @@ else:
 
 print("\n=== CAMPOS DISPONÍVEIS NOS JOGOS ===")
 
-primeiro_jogo = next(iter(jogos.values()))
-
-for campo in primeiro_jogo.keys():
+for campo in jogos.columns:
     print(campo)
 
-    # ==========================================
+# ==========================================
 # 4. ANALISAR GÊNEROS E TAGS DOS JOGOS
 # ==========================================
 
 print("\n=== GÊNEROS E TAGS DOS JOGOS ===")
 
-for game_id, jogo in list(jogos.items())[:3]:
-    print(f"\nJogo: {jogo.get('name')}")
-    print(f"ID: {game_id}")
-    print(f"Gêneros: {jogo.get('genres')}")
-    print(f"Tags: {jogo.get('tags')}")
-    print(f"Descrição curta: {str(jogo.get('short_description'))[:200]}")
+com_texto = jogos[jogos["About the game"].notna() & jogos["Tags"].notna()]
+for _, jogo in com_texto.head(3).iterrows():
+    print(f"\nJogo: {jogo['Name']}")
+    print(f"ID: {jogo['AppID']}")
+    print(f"Gêneros: {jogo['Genres']}")
+    print(f"Tags: {jogo['Tags']}")
+    print(f"Descrição curta: {str(jogo['About the game'])[:200]}")

@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 from pathlib import Path
 
@@ -6,8 +7,11 @@ from pathlib import Path
 # ==========================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BASE_DIR))
+from backend.config import caminho_bruto  # noqa: E402
 
-caminho_jogos = BASE_DIR / "data" / "games.csv"
+# Original baixado do Hugging Face (python scripts/baixar_datasets.py)
+caminho_jogos = caminho_bruto("jogos")
 
 # Ler os nomes originais das colunas
 colunas = pd.read_csv(
