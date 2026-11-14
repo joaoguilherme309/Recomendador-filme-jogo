@@ -5,7 +5,7 @@ pydantic>=2.9.0
 python-multipart>=0.0.12
 
 # Banco de Dados (SQLite + ORM)
-sqlalchemy>=
+sqlalchemy>=2.0.0
 
 # Processamento de Dados e NLP
 pandas>=2.2.0
