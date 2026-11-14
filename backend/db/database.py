@@ -1,0 +1,30 @@
+# Função no sistema: Configurar a conexão com o banco de dados SQLite via SQLAlchemy
+# e fornecer sessões transacionais para os endpoints da API.
+
+from pathlib import Path
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+DATA_DIR = BASE_DIR / "data"
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+DATABASE_URL = f"sqlite:///{DATA_DIR / 'recomendador.db'}"
+
+# check_same_thread=False permite o uso seguro da conexão entre threads do FastAPI
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False},
+)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
