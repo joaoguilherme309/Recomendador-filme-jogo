@@ -1,0 +1,86 @@
+{
+  "dataset": "jogos",
+  "gerado_em": "2026-11-14T18:23:02+00:00",
+  "etapas": [
+    {
+      "etapa": "registros brutos",
+      "removidos": 0,
+      "restantes": 125855
+    },
+    {
+      "etapa": "sem nome",
+      "motivo": "nome vazio",
+      "removidos": 1,
+      "restantes": 125854
+    },
+    {
+      "etapa": "sem texto (descrição, gêneros e tags vazios)",
+      "motivo": "nada para vetorizar",
+      "removidos": 8280,
+      "restantes": 117574
+    },
+    {
+      "etapa": "sem avaliação",
+      "motivo": "sem sinal de que o jogo foi publicado e jogado; demos, playtests, soundtracks e DLCs isentos",
+      "removidos": 34570,
+      "restantes": 83004
+    },
+    {
+      "etapa": "software (só gêneros de aplicativo)",
+      "motivo": "aplicativo, não jogo; demos, playtests, soundtracks e DLCs isentos",
+      "removidos": 977,
+      "restantes": 82027
+    },
+    {
+      "etapa": "conteúdo sexual explícito",
+      "motivo": "gênero ou tag em ['Hentai', 'NSFW', 'Nudity', 'Sexual Content']",
+      "removidos": 4159,
+      "restantes": 77868
+    },
+    {
+      "etapa": "título não latino",
+      "motivo": "menos de 50% das letras do título são latinas",
+      "removidos": 1241,
+      "restantes": 76627
+    },
+    {
+      "etapa": "descrição não latina",
+      "motivo": "o tratamento textual é feito só em inglês",
+      "removidos": 513,
+      "restantes": 76114
+    },
+    {
+      "etapa": "nome duplicado",
+      "motivo": "mesmo nome após normalização; mantido o registro com mais avaliações",
+      "removidos": 748,
+      "restantes": 75366
+    },
+    {
+      "etapa": "AppID duplicado",
+      "motivo": "registro repetido",
+      "removidos": 0,
+      "restantes": 75366
+    }
+  ],
+  "parametros": {
+    "min_avaliacoes": 1,
+    "limite_latino": 0.5,
+    "remover_conteudo_sexual": true,
+    "tamanho_texto_curto": 100
+  },
+  "tipos_item": {
+    "jogo": 75279,
+    "demo": 61,
+    "playtest": 19,
+    "dlc": 4,
+    "soundtrack": 3
+  },
+  "sinalizacoes": {
+    "sem_tags": 53,
+    "texto_curto": 209,
+    "sem_suporte_ingles": 1343,
+    "idade_minima_18": 65,
+    "sem_imagem": 40,
+    "sem_data": 0
+  }
+}

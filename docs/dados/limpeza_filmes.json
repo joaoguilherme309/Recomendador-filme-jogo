@@ -1,0 +1,34 @@
+{
+  "dataset": "filmes",
+  "gerado_em": "2026-11-14T18:17:04+00:00",
+  "etapas": [
+    {
+      "etapa": "registros brutos",
+      "removidos": 0,
+      "restantes": 10000
+    },
+    {
+      "etapa": "sem título",
+      "motivo": "título vazio",
+      "removidos": 0,
+      "restantes": 10000
+    },
+    {
+      "etapa": "id duplicado",
+      "motivo": "mesmo filme capturado mais de uma vez; mantido o registro com mais votos",
+      "removidos": 36,
+      "restantes": 9964
+    },
+    {
+      "etapa": "sem texto (sem sinopse e sem gêneros)",
+      "motivo": "nada para vetorizar",
+      "removidos": 0,
+      "restantes": 9964
+    }
+  ],
+  "sinalizacoes": {
+    "titulo_repetido": 690,
+    "sem_sinopse": 2,
+    "sem_data": 3
+  }
+}

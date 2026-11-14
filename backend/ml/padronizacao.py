@@ -3,13 +3,12 @@
 
 import ast
 import re
-from pathlib import Path
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import pandas as pd
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+from backend.config import caminho_processado
 
 # Garante recursos do NLTK disponíveis na máquina
 for pacote in ("stopwords", "wordnet", "omw-1.4"):
@@ -103,8 +102,8 @@ def expandir_temas_filme(generos_padronizados, texto_limpo):
 
 
 def executar_padronizacao():
-    filmes = pd.read_csv(BASE_DIR / "data" / "filmes_processados.csv", low_memory=False)
-    jogos = pd.read_csv(BASE_DIR / "data" / "jogos_processados.csv", low_memory=False)
+    filmes = pd.read_csv(caminho_processado("filmes_processados.csv"), low_memory=False)
+    jogos = pd.read_csv(caminho_processado("jogos_processados.csv"), low_memory=False)
 
     filmes["genres"] = filmes["genres"].apply(converter_lista)
     filmes["generos_padronizados"] = filmes["genres"].apply(
@@ -143,8 +142,8 @@ def executar_padronizacao():
     filmes = filmes.reset_index(drop=True)
     jogos = jogos.reset_index(drop=True)
 
-    filmes.to_csv(BASE_DIR / "data" / "filmes_padronizados.csv", index=False, encoding="utf-8")
-    jogos.to_csv(BASE_DIR / "data" / "jogos_padronizados.csv", index=False, encoding="utf-8")
+    filmes.to_csv(caminho_processado("filmes_padronizados.csv"), index=False, encoding="utf-8")
+    jogos.to_csv(caminho_processado("jogos_padronizados.csv"), index=False, encoding="utf-8")
     print("Padronização concluída com sucesso!")
 
 
