@@ -1,42 +1,73 @@
-// Função no sistema: Orquestrar a interface principal estilo chatbot em fundo preto,
-// integrando SeletorFilmes, CardJogo, ListaFranquias e o protótipo TelaLoginMockup.
 
-import React, { useEffect, useRef, useState } from "react";
-import { Alert, Box, Button, Chip, Paper, Typography } from "@mui/material";
+import React, { useRef, useState } from "react";
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  Container,
+  Paper,
+  Typography,
+} from "@mui/material";
+
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import SportsEsportsOutlinedIcon from "@mui/icons-material/SportsEsportsOutlined";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import MovieOutlinedIcon from "@mui/icons-material/MovieOutlined";
+
 import { CardJogo } from "./components/CardJogo";
 import { ListaFranquias } from "./components/ListaFranquias";
 import { SeletorFilmes } from "./components/SeletorFilmes";
 import { TelaLoginMockup } from "./components/TelaLogin";
 import { gerarRecomendacoes } from "./services/api";
-import { FilmeResumo, RecomendacaoResponse } from "./types/recomendacao";
+import {
+  FilmeResumo,
+  RecomendacaoResponse,
+} from "./types/recomendacao";
+
+const cores = {
+  fundo: "#FAF9F6",
+  branco: "#FFFFFF",
+  texto: "#171717",
+  secundario: "#666666",
+  verde: "#285C36",
+  verdeClaro: "#E9EFE7",
+  borda: "#E7E5E1",
+};
 
 export const App: React.FC = () => {
-  const [exibirLoginMockup, setExibirLoginMockup] = useState(false);
-  const [historico, setHistorico] = useState<RecomendacaoResponse[]>([]);
+  const [exibirLoginMockup, setExibirLoginMockup] =
+    useState(false);
+
+  const [historico, setHistorico] = useState<
+    RecomendacaoResponse[]
+  >([]);
+
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
-  const fimChatRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    fimChatRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [historico]);
+  const resultadosRef = useRef<HTMLDivElement | null>(null);
 
-  if (exibirLoginMockup) {
-    return <TelaLoginMockup onVoltar={() => setExibirLoginMockup(false)} />;
-  }
-
-  const handleGerarRecomendacoes = async (filmes: FilmeResumo[]) => {
+  const handleGerarRecomendacoes = async (
+    filmes: FilmeResumo[]
+  ) => {
     setCarregando(true);
     setErro(null);
+
     try {
       const resposta = await gerarRecomendacoes({
         movie_ids: filmes.map((f) => f.movie_id),
         top_n: 10,
       });
+
       setHistorico((prev) => [...prev, resposta]);
+
+      setTimeout(() => {
+        resultadosRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
     } catch {
       setErro(
         "Não foi possível conectar à API. Verifique se o servidor FastAPI está em execução na porta 8000."
@@ -46,183 +77,515 @@ export const App: React.FC = () => {
     }
   };
 
+  if (exibirLoginMockup) {
+    return (
+      <TelaLoginMockup
+        onVoltar={() => setExibirLoginMockup(false)}
+      />
+    );
+  }
+
+  const ultimaConsulta =
+    historico.length > 0
+      ? historico[historico.length - 1]
+      : null;
+
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#000000",
-        color: "#ffffff",
-        display: "flex",
-        flexDirection: "column",
+        bgcolor: cores.fundo,
+        color: cores.texto,
+        fontFamily: "Inter, Roboto, sans-serif",
       }}
     >
-      {/* Cabeçalho minimalista com acesso ao protótipo de Login/Cadastro */}
+      {/* CABEÇALHO */}
       <Box
         sx={{
-          px: 3,
-          py: 1.8,
-          borderBottom: "1px solid #1a1a1a",
+          bgcolor: cores.branco,
+          borderBottom: `1px solid ${cores.borda}`,
+          px: { xs: 2, md: 5 },
+          py: 2,
           display: "flex",
-          alignItems: "center",
           justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <SportsEsportsOutlinedIcon sx={{ color: "#ffffff" }} />
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, letterSpacing: 0.3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.2,
+          }}
+        >
+          <SportsEsportsOutlinedIcon
+            sx={{
+              color: cores.texto,
+              fontSize: 29,
+            }}
+          />
+
+          <Typography
+            sx={{
+              fontWeight: 700,
+              fontSize: { xs: 15, md: 19 },
+              letterSpacing: -0.4,
+            }}
+          >
             CineGame Recommender
           </Typography>
         </Box>
 
         <Button
           variant="outlined"
-          size="small"
           startIcon={<PersonOutlineIcon />}
           onClick={() => setExibirLoginMockup(true)}
           sx={{
-            color: "#e5e5e5",
-            borderColor: "#2e2e2e",
-            borderRadius: "20px",
+            color: cores.texto,
+            borderColor: "#DADADA",
+            borderRadius: "25px",
             textTransform: "none",
-            px: 2,
-            "&:hover": { borderColor: "#525252", bgcolor: "#121212" },
+            fontWeight: 600,
+            px: 2.5,
+            "&:hover": {
+              borderColor: cores.verde,
+              bgcolor: cores.verdeClaro,
+            },
           }}
         >
           Entrar / Criar conta
         </Button>
       </Box>
 
-      {/* Área central de conversa estilo chatbot */}
-      <Box
+      {/* CONTEÚDO */}
+      <Container
+        maxWidth="xl"
         sx={{
-          flex: 1,
-          width: "100%",
-          maxWidth: 860,
-          mx: "auto",
-          px: 2,
-          py: 4,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: historico.length === 0 ? "center" : "flex-start",
+          py: { xs: 5, md: 9 },
+          px: { xs: 2, md: 5 },
         }}
       >
-        {historico.length === 0 ? (
-          <Box sx={{ textAlign: "center", mb: 4 }}>
-            <Typography variant="h4" sx={{ fontWeight: 600, mb: 1.5, color: "#f5f5f5" }}>
-              Quais filmes você mais gosta?
-            </Typography>
-            <Typography variant="body1" sx={{ color: "#8e8e8e", maxWidth: 540, mx: "auto" }}>
-              Escolha de 2 a 3 filmes abaixo. Analisamos os gêneros, temáticas e ambientações para
-              recomendar jogos equivalentes.
-            </Typography>
-          </Box>
-        ) : (
-          historico.map((item) => (
+        {/* APRESENTAÇÃO */}
+        <Box sx={{ mb: 7 }}>
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: 750,
+              fontSize: {
+                xs: "2rem",
+                md: "3.2rem",
+              },
+              lineHeight: 1.15,
+              letterSpacing: -1.5,
+              maxWidth: 850,
+              mb: 2.5,
+            }}
+          >
+            Descubra jogos com a mesma
+            <br />
+            vibe dos seus filmes favoritos
+          </Typography>
+
+          <Typography
+            variant="body1"
+            sx={{
+              color: cores.secundario,
+              maxWidth: 760,
+              fontSize: "1.1rem",
+              lineHeight: 1.8,
+            }}
+          >
+            Diga quais filmes você gosta e receba
+            recomendações de jogos com gêneros,
+            temas e atmosferas semelhantes.
+          </Typography>
+        </Box>
+
+        {/* DUAS COLUNAS */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              lg: "minmax(0, 1.7fr) minmax(0, 1fr)",
+            },
+            gap: 3,
+            alignItems: "stretch",
+          }}
+        >
+          {/* CARD DE SELEÇÃO */}
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 3, md: 4 },
+              borderRadius: "18px",
+              border: `1px solid ${cores.borda}`,
+              bgcolor: cores.branco,
+              boxShadow: "0 8px 30px rgba(0,0,0,0.035)",
+            }}
+          >
+            {/* ETAPAS */}
             <Box
-              key={item.consulta_id}
-              sx={{ display: "flex", flexDirection: "column", gap: 2.5, mb: 4 }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 1.5,
+                mb: 5,
+              }}
             >
-              {/* Mensagem do usuário à direita */}
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <Paper
-                  elevation={0}
+              {[
+                "Filmes",
+                "Preferências",
+                "Recomendações",
+              ].map((etapa, index) => (
+                <React.Fragment key={etapa}>
+                  {index > 0 && (
+                    <Box
+                      sx={{
+                        width: { xs: 15, md: 35 },
+                        height: 1,
+                        bgcolor: "#D9D9D9",
+                      }}
+                    />
+                  )}
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: "50%",
+                        bgcolor:
+                          index === 0
+                            ? cores.verde
+                            : "#F1F0ED",
+                        color:
+                          index === 0
+                            ? "#FFFFFF"
+                            : "#666666",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: 600,
+                        fontSize: 14,
+                      }}
+                    >
+                      {index + 1}
+                    </Box>
+
+                    <Typography
+                      sx={{
+                        color:
+                          index === 0
+                            ? cores.texto
+                            : cores.secundario,
+                        fontSize: 14,
+                        fontWeight:
+                          index === 0 ? 700 : 400,
+                      }}
+                    >
+                      {etapa}
+                    </Typography>
+                  </Box>
+                </React.Fragment>
+              ))}
+            </Box>
+
+            <SeletorFilmes
+              onEnviar={handleGerarRecomendacoes}
+              carregando={carregando}
+            />
+          </Paper>
+
+          {/* PAINEL LATERAL */}
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 3, md: 4 },
+              bgcolor: "#F0EFEC",
+              borderRadius: "18px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                color: cores.texto,
+              }}
+            >
+              {ultimaConsulta
+                ? "Sua última recomendação"
+                : "Como funciona?"}
+            </Typography>
+
+            {ultimaConsulta ? (
+              <>
+                <Typography
                   sx={{
-                    bgcolor: "#1f1f1f",
-                    color: "#ffffff",
-                    px: 2.5,
-                    py: 1.5,
-                    borderRadius: "20px 20px 4px 20px",
-                    maxWidth: "75%",
-                    border: "1px solid #2e2e2e",
+                    color: cores.secundario,
+                    lineHeight: 1.7,
                   }}
                 >
-                  <Typography variant="caption" sx={{ color: "#9ca3af", display: "block", mb: 0.5 }}>
-                    Filmes escolhidos:
+                  Encontramos{" "}
+                  {ultimaConsulta.recomendacoes.length} jogos
+                  com características semelhantes
+                  aos seus filmes favoritos.
+                </Typography>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 1,
+                  }}
+                >
+                  {ultimaConsulta.filmes_selecionados.map(
+                    (filme) => (
+                      <Chip
+                        key={filme.movie_id}
+                        label={filme.title}
+                        sx={{
+                          bgcolor: cores.verdeClaro,
+                          color: cores.verde,
+                          fontWeight: 500,
+                        }}
+                      />
+                    )
+                  )}
+                </Box>
+
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    resultadosRef.current?.scrollIntoView({
+                      behavior: "smooth",
+                    })
+                  }
+                  sx={{
+                    mt: 2,
+                    bgcolor: cores.verde,
+                    textTransform: "none",
+                    borderRadius: 2,
+                    boxShadow: "none",
+                    "&:hover": {
+                      bgcolor: "#1D4629",
+                    },
+                  }}
+                >
+                  Ver recomendações
+                </Button>
+              </>
+            ) : (
+              <>
+                <Typography
+                  sx={{
+                    color: cores.secundario,
+                    lineHeight: 1.8,
+                  }}
+                >
+                  Nosso sistema analisa as características
+                  dos filmes selecionados e procura jogos
+                  com experiências semelhantes.
+                </Typography>
+
+                {[
+                  {
+                    numero: "01",
+                    titulo: "Escolha seu filmes",
+                    descricao:
+                      "Selecione um filme que você gosta.",
+                  },
+                  {
+                    numero: "02",
+                    titulo: "Análise de conteúdo",
+                    descricao:
+                      "Comparamos gêneros, temas e características.",
+                  },
+                  {
+                    numero: "03",
+                    titulo: "Descubra novos jogos",
+                    descricao:
+                      "Receba uma lista de jogos recomendados.",
+                  },
+                ].map((passo) => (
+                  <Box
+                    key={passo.numero}
+                    sx={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 2,
+                      py: 1,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        color: cores.verde,
+                        fontWeight: 700,
+                        fontSize: 15,
+                      }}
+                    >
+                      {passo.numero}
+                    </Typography>
+
+                    <Box>
+                      <Typography
+                        sx={{
+                          fontWeight: 650,
+                          color: cores.texto,
+                        }}
+                      >
+                        {passo.titulo}
+                      </Typography>
+
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: cores.secundario,
+                          mt: 0.5,
+                        }}
+                      >
+                        {passo.descricao}
+                      </Typography>
+                    </Box>
+                  </Box>
+                ))}
+              </>
+            )}
+          </Paper>
+        </Box>
+
+        {/* ERRO */}
+        {erro && (
+          <Alert severity="error" sx={{ mt: 3 }}>
+            {erro}
+          </Alert>
+        )}
+
+        {/* RESULTADOS DA API */}
+        {historico.length > 0 && (
+          <Box
+            ref={resultadosRef}
+            sx={{
+              mt: 9,
+              scrollMarginTop: "30px",
+            }}
+          >
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 700,
+                mb: 1,
+              }}
+            >
+              Seus jogos recomendados
+            </Typography>
+
+            <Typography
+              sx={{
+                color: cores.secundario,
+                mb: 4,
+              }}
+            >
+              Resultados personalizados com base
+              nos filmes que você escolheu.
+            </Typography>
+
+            {historico.map((item, consultaIndex) => (
+              <Box
+                key={item.consulta_id}
+                sx={{ mb: 7 }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    flexWrap: "wrap",
+                    mb: 3,
+                  }}
+                >
+                  <MovieOutlinedIcon
+                    sx={{ color: cores.verde }}
+                  />
+
+                  <Typography sx={{ fontWeight: 600 }}>
+                    Consulta {consultaIndex + 1}
                   </Typography>
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.8 }}>
-                    {item.filmes_selecionados.map((filme) => (
+
+                  {item.filmes_selecionados.map(
+                    (filme) => (
                       <Chip
                         key={filme.movie_id}
                         label={filme.title}
                         size="small"
-                        sx={{ bgcolor: "#2e2e2e", color: "#ffffff", fontWeight: 500 }}
+                        sx={{
+                          bgcolor: cores.verdeClaro,
+                          color: cores.verde,
+                        }}
                       />
-                    ))}
-                  </Box>
-                </Paper>
-              </Box>
-
-              {/* Resposta do sistema à esquerda */}
-              <Box sx={{ display: "flex", gap: 1.5, alignItems: "flex-start" }}>
-                <Box
-                  sx={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: "50%",
-                    bgcolor: "#1a1a1a",
-                    border: "1px solid #2e2e2e",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                    mt: 0.5,
-                  }}
-                >
-                  <SmartToyOutlinedIcon sx={{ color: "#ffffff", fontSize: 18 }} />
+                    )
+                  )}
                 </Box>
 
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="body2" sx={{ color: "#d4d4d4", mb: 2 }}>
-                    Com base nas características dos filmes selecionados, estes são os{" "}
-                    <strong>{item.recomendacoes.length} jogos mais compatíveis</strong>:
-                  </Typography>
-
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-                    {item.recomendacoes.map((jogo, idx) => (
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "1fr",
+                      md: "repeat(2, minmax(0, 1fr))",
+                    },
+                    gap: 2,
+                  }}
+                >
+                  {item.recomendacoes.map((jogo, idx) => (
+                    <Box key={jogo.game_id}>
                       <CardJogo
-                        key={jogo.game_id}
                         posicao={idx + 1}
                         jogo={jogo}
                         consultaId={item.consulta_id}
                       />
-                    ))}
-                  </Box>
+                    </Box>
+                  ))}
+                </Box>
 
+                <Box sx={{ mt: 3 }}>
                   <ListaFranquias
                     franquias={item.franquias_identificadas}
                     jogos={item.jogos_franquia}
                   />
                 </Box>
               </Box>
-            </Box>
-          ))
+            ))}
+
+            <Button
+              startIcon={<ArrowBackIcon />}
+              onClick={() =>
+                window.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                })
+              }
+              sx={{
+                color: cores.verde,
+                textTransform: "none",
+                fontWeight: 600,
+              }}
+            >
+              Escolher outros filmes
+            </Button>
+          </Box>
         )}
-
-        {erro && (
-          <Alert
-            severity="error"
-            sx={{ mb: 2, bgcolor: "#2a1215", color: "#fecaca", border: "1px solid #5c1d24" }}
-          >
-            {erro}
-          </Alert>
-        )}
-
-        <div ref={fimChatRef} />
-      </Box>
-
-      {/* Caixa de entrada fixa na base */}
-      <Box
-        sx={{
-          position: "sticky",
-          bottom: 0,
-          bgcolor: "#000000",
-          px: 2,
-          pb: 2.5,
-          pt: 1,
-        }}
-      >
-        <SeletorFilmes onEnviar={handleGerarRecomendacoes} carregando={carregando} />
-      </Box>
+      </Container>
     </Box>
   );
 };
