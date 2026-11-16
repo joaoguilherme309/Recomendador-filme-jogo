@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from "react";
+
 import {
   Autocomplete,
   Box,
@@ -14,7 +15,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 import { buscarFilmes } from "../services/api";
-import { FilmeResumo } from "../types/recomendacao";
+import type { FilmeResumo } from "../types/recomendacao";
 
 interface SeletorFilmesProps {
   onEnviar: (filmes: FilmeResumo[]) => void;
@@ -25,17 +26,24 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
   onEnviar,
   carregando,
 }) => {
-  const [selecionados, setSelecionados] = useState<FilmeResumo[]>([]);
+  const [selecionados, setSelecionados] = useState<FilmeResumo[]>(
+    []
+  );
+
   const [opcoes, setOpcoes] = useState<FilmeResumo[]>([]);
+
+  // Texto controlado pelo React
   const [termoBusca, setTermoBusca] = useState("");
+
   const [buscando, setBuscando] = useState(false);
 
-  // Busca de filmes na API
+  // BUSCA DE FILMES NA API
   useEffect(() => {
     const query = termoBusca.trim();
+
     let ativo = true;
 
-    if (query.length < 2) {
+    if (query.length < 2 || selecionados.length >= 3) {
       setOpcoes([]);
       setBuscando(false);
       return;
@@ -65,24 +73,29 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
       ativo = false;
       clearTimeout(timer);
     };
-  }, [termoBusca]);
+  }, [termoBusca, selecionados.length]);
 
+  // VALIDAÇÃO DO ENVIO
   const podeEnviar =
     selecionados.length >= 2 &&
     selecionados.length <= 3 &&
     !carregando;
 
+  // ENVIO DAS RECOMENDAÇÕES
   const handleEnviar = () => {
     if (!podeEnviar) return;
 
-    onEnviar(selecionados);
+    onEnviar([...selecionados]);
+
     setSelecionados([]);
     setTermoBusca("");
+    setOpcoes([]);
   };
 
   return (
     <Box sx={{ width: "100%" }}>
       {/* TÍTULO */}
+
       <Typography
         variant="h5"
         sx={{
@@ -105,40 +118,74 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
       </Typography>
 
       {/* CAMPO DE BUSCA */}
+
       <Autocomplete<FilmeResumo, true, false, false>
         multiple
         fullWidth
         options={opcoes}
         value={selecionados}
+
+        // CORREÇÃO: O TEXTO AGORA É CONTROLADO
+        inputValue={termoBusca}
+
         loading={buscando}
         filterOptions={(x) => x}
         filterSelectedOptions
+        disabled={carregando}
+
         getOptionLabel={(option) => option.title}
+
         isOptionEqualToValue={(opt, val) =>
           opt.movie_id === val.movie_id
         }
+
+        // CORREÇÃO: PRESERVA O TEXTO AO PERDER O FOCO
         onInputChange={(_, novoTexto, reason) => {
           if (reason === "input") {
-            setTermoBusca(novoTexto);
-          } else if (
-            reason === "clear" ||
-            reason === "reset"
-          ) {
+            if (selecionados.length < 3) {
+              setTermoBusca(novoTexto);
+            }
+          }
+
+          if (reason === "clear") {
             setTermoBusca("");
           }
+
+          // Ignoramos "blur" e "reset".
+          // Assim, o texto não desaparece ao clicar fora.
         }}
-        onChange={(_, novosValores) => {
+
+        // SELEÇÃO DOS FILMES
+        onChange={(_, novosValores, reason) => {
           if (novosValores.length <= 3) {
             setSelecionados(novosValores);
+
+            if (
+              reason === "selectOption" ||
+              reason === "clear"
+            ) {
+              // Limpa a pesquisa apenas depois da seleção
+              // ou quando o usuário limpa o campo.
+              setTermoBusca("");
+              setOpcoes([]);
+            }
           }
         }}
+
         noOptionsText={
-          termoBusca.trim().length < 2
+          selecionados.length >= 3
+            ? "Limite de 3 filmes atingido"
+            : termoBusca.trim().length < 2
             ? "Digite pelo menos 2 letras..."
             : "Nenhum filme encontrado"
         }
+
         loadingText="Buscando filmes..."
+
         openOnFocus={false}
+        clearOnBlur={false}
+        clearOnEscape={false}
+
         slotProps={{
           paper: {
             sx: {
@@ -179,7 +226,11 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
             },
           },
         }}
+
+        // OCULTA AS TAGS DENTRO DO CAMPO
         renderTags={() => null}
+
+        // LISTA DE RESULTADOS
         renderOption={(props, option) => {
           const { key, ...rest } = props;
 
@@ -207,7 +258,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
                 {option.title}
               </Typography>
 
-              {option.genres.length > 0 && (
+              {(option.genres ?? []).length > 0 && (
                 <Typography
                   variant="caption"
                   sx={{
@@ -221,6 +272,8 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
             </Box>
           );
         }}
+
+        // CAMPO DE TEXTO
         renderInput={(params) => (
           <TextField
             {...params}
@@ -240,6 +293,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
                       mr: 1,
                     }}
                   />
+
                   {params.InputProps.startAdornment}
                 </>
               ),
@@ -252,10 +306,12 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
                       sx={{ color: "#285C36" }}
                     />
                   )}
+
                   {params.InputProps.endAdornment}
                 </>
               ),
             }}
+
             sx={{
               "& .MuiOutlinedInput-root": {
                 bgcolor: "#FFFFFF",
@@ -277,14 +333,12 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
                 },
               },
 
-              // CORREÇÃO DO TEXTO DIGITADO
               "& .MuiInputBase-input": {
                 color: "#171717 !important",
                 WebkitTextFillColor: "#171717",
                 fontSize: "15px",
               },
 
-              // CORREÇÃO DO PLACEHOLDER
               "& .MuiInputBase-input::placeholder": {
                 color: "#858585 !important",
                 WebkitTextFillColor: "#858585",
@@ -301,6 +355,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
       />
 
       {/* FILMES SELECIONADOS */}
+
       <Box
         sx={{
           display: "flex",
@@ -340,6 +395,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
       </Box>
 
       {/* CONTADOR */}
+
       <Typography
         variant="caption"
         sx={{
@@ -349,10 +405,11 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
         }}
       >
         {selecionados.length}/3 filmes selecionados
-        (mínimo de 2)
+        {" "}(mínimo de 2)
       </Typography>
 
       {/* BOTÃO DE RECOMENDAÇÃO */}
+
       <Box
         sx={{
           borderTop: "1px solid #EAEAEA",

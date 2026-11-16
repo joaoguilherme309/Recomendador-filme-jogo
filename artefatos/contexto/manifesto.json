@@ -2,7 +2,7 @@
   "artefato": "contexto",
   "descricao": "Vetores TF-IDF de filmes e jogos em vocabulário compartilhado, usados na recomendação baseada em conteúdo (similaridade do cosseno).",
   "versao_formato": 1,
-  "gerado_em": "2026-11-14T17:51:52+00:00",
+  "gerado_em": "2026-11-15T22:19:18+00:00",
   "datasets_origem": {
     "filmes": {
       "repo_id": "jason1966/algozee_global-movie-trends-2026",
@@ -11,7 +11,7 @@
       "url": "https://huggingface.co/datasets/jason1966/algozee_global-movie-trends-2026/blob/1d112c7485f59eaa57fc78aa1ce16d5481964c74/tmdb_top_10k_movies_2026.csv.csv",
       "sha256": "2e3e38e421afc935e1b686c47f7da32960baab12a962b8d75b767ea64556f00e",
       "tamanho_bytes": 3399497,
-      "baixado_em": "2026-11-14T17:48:52+00:00"
+      "baixado_em": "2026-11-15T22:16:30+00:00"
     },
     "jogos": {
       "repo_id": "FronkonGames/steam-games-dataset",
@@ -20,12 +20,12 @@
       "url": "https://huggingface.co/datasets/FronkonGames/steam-games-dataset/blob/6c21457b9ebf0a6a7f5b91e11281d65d456ea30e/games.csv",
       "sha256": "1b48008b01a799d82385d6e66ba0cb65dd477b6aa4b6c2ec8c443025ab6880ad",
       "tamanho_bytes": 401140503,
-      "baixado_em": "2026-11-14T17:49:20+00:00"
+      "baixado_em": "2026-11-15T22:16:42+00:00"
     }
   },
   "vetorizador": {
     "tipo": "TfidfVectorizer",
-    "scikit_learn": "1.8.0",
+    "scikit_learn": "1.9.1",
     "parametros": {
       "max_features": 20000,
       "min_df": 2,
@@ -43,7 +43,7 @@
       "colunas": 20000
     },
     "jogos": {
-      "linhas": 82956,
+      "linhas": 75366,
       "colunas": 20000
     }
   }

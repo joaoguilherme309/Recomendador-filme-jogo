@@ -2,16 +2,16 @@
 import React from "react";
 import { Box, Chip, Paper, Typography } from "@mui/material";
 
-import { JogoRecomendado } from "../types/recomendacao";
+import type { JogoRecomendado } from "../types/recomendacao";
 import { AvaliacaoUsuario } from "./AvaliacaoUsuario";
 
 interface CardJogoProps {
-  posicao: number;
+  posicao?: number;
   jogo: JogoRecomendado;
-  consultaId: number;
+  consultaId?: number;
+  variante?: "principal" | "franquia";
 }
 
-// Identidade visual do CineGame Recommender
 const cores = {
   branco: "#FFFFFF",
   texto: "#171717",
@@ -19,9 +19,11 @@ const cores = {
   verde: "#285C36",
   verdeClaro: "#E9EFE7",
   borda: "#E7E5E1",
+  azul: "#3283CE",
+  azulClaro: "#EAF4FF",
 };
 
-// Define a aparência de cada posição do ranking
+// Aparência das posições do ranking principal
 const obterEstiloRanking = (posicao: number) => {
   switch (posicao) {
     case 1:
@@ -41,7 +43,7 @@ const obterEstiloRanking = (posicao: number) => {
         selo: "Recomendado",
         seloFundo: "#E8ECF0",
         seloTexto: "#53606D",
-        
+        medalha: "🥈",
       };
 
     case 3:
@@ -51,7 +53,7 @@ const obterEstiloRanking = (posicao: number) => {
         selo: "Recomendado",
         seloFundo: "#FBE6D3",
         seloTexto: "#8A4F1D",
-        
+        medalha: "🥉",
       };
 
     default:
@@ -70,15 +72,45 @@ export const CardJogo: React.FC<CardJogoProps> = ({
   posicao,
   jogo,
   consultaId,
+  variante = "principal",
 }) => {
-  const ranking = obterEstiloRanking(posicao);
+  const ehFranquia = variante === "franquia";
+
+  const ranking = obterEstiloRanking(posicao ?? 0);
+
+  // Jogos de franquia possuem identidade azul
+  const bordaCard = ehFranquia
+    ? cores.azul
+    : ranking.borda;
+
+  const fundoCard = ehFranquia
+    ? cores.branco
+    : ranking.fundo;
+
+  const corDestaque = ehFranquia
+    ? cores.azul
+    : cores.verde;
+
+  const fundoDestaque = ehFranquia
+    ? cores.azulClaro
+    : cores.verdeClaro;
+
+  const termosEmComum =
+    jogo.explicacao?.termos_em_comum ?? [];
+
+  const termosExibidos =
+    termosEmComum.length > 0
+      ? termosEmComum
+      : ehFranquia
+      ? [...(jogo.genres ?? []), ...(jogo.tags ?? [])].slice(0, 5)
+      : [];
 
   return (
     <Paper
       elevation={0}
       sx={{
-        bgcolor: ranking.fundo,
-        border: `2px solid ${ranking.borda}`,
+        bgcolor: fundoCard,
+        border: `2px solid ${bordaCard}`,
         borderRadius: "16px",
         p: { xs: 2, sm: 2.5 },
         display: "flex",
@@ -86,21 +118,26 @@ export const CardJogo: React.FC<CardJogoProps> = ({
         gap: 2,
         height: "100%",
         boxSizing: "border-box",
+
         boxShadow:
-          posicao <= 3
+          !ehFranquia && posicao !== undefined && posicao <= 3
             ? "0 5px 20px rgba(0,0,0,0.055)"
             : "0 3px 12px rgba(0,0,0,0.035)",
+
         transition:
           "transform 0.2s ease, box-shadow 0.2s ease",
 
         "&:hover": {
           transform: "translateY(-3px)",
-          boxShadow: "0 8px 26px rgba(0,0,0,0.09)",
+          boxShadow: ehFranquia
+            ? "0 8px 26px rgba(50,131,206,0.14)"
+            : "0 8px 26px rgba(0,0,0,0.09)",
         },
       }}
     >
-      {/* SELO DO RANKING */}
-      {ranking.selo && (
+      {/* SELO DO RANKING PRINCIPAL */}
+
+      {!ehFranquia && ranking.selo && (
         <Box
           sx={{
             display: "flex",
@@ -128,6 +165,7 @@ export const CardJogo: React.FC<CardJogoProps> = ({
       )}
 
       {/* IMAGEM E INFORMAÇÕES PRINCIPAIS */}
+
       <Box
         sx={{
           display: "flex",
@@ -139,7 +177,8 @@ export const CardJogo: React.FC<CardJogoProps> = ({
           gap: 2,
         }}
       >
-        {/* CAPA DO JOGO */}
+        {/* IMAGEM DO JOGO */}
+
         {jogo.header_image ? (
           <Box
             component="img"
@@ -189,7 +228,8 @@ export const CardJogo: React.FC<CardJogoProps> = ({
           </Box>
         )}
 
-        {/* DADOS DO JOGO */}
+        {/* INFORMAÇÕES */}
+
         <Box
           sx={{
             flex: 1,
@@ -197,7 +237,8 @@ export const CardJogo: React.FC<CardJogoProps> = ({
             width: "100%",
           }}
         >
-          {/* NOME DO JOGO */}
+          {/* NOME */}
+
           <Typography
             variant="subtitle1"
             sx={{
@@ -209,16 +250,20 @@ export const CardJogo: React.FC<CardJogoProps> = ({
               mb: 1,
             }}
           >
-            {posicao}. {jogo.name}
+            {!ehFranquia && posicao !== undefined
+              ? `${posicao}. `
+              : ""}
+            {jogo.name}
           </Typography>
 
-          {/* PONTUAÇÃO DE SIMILARIDADE */}
+          {/* SIMILARIDADE */}
+
           <Chip
             label={`${(jogo.similaridade * 100).toFixed(1)}% de similaridade`}
             size="small"
             sx={{
-              bgcolor: cores.verdeClaro,
-              color: cores.verde,
+              bgcolor: fundoDestaque,
+              color: corDestaque,
               fontWeight: 700,
               fontSize: "0.72rem",
               borderRadius: "7px",
@@ -227,8 +272,9 @@ export const CardJogo: React.FC<CardJogoProps> = ({
             }}
           />
 
-          {/* EXPLICAÇÃO DO MODELO */}
-          {jogo.explicacao && (
+          {/* EXPLICAÇÃO */}
+
+          {ehFranquia ? (
             <Typography
               variant="body2"
               sx={{
@@ -238,58 +284,101 @@ export const CardJogo: React.FC<CardJogoProps> = ({
                 overflowWrap: "anywhere",
               }}
             >
-              {jogo.explicacao.justificativa}
+              Jogo relacionado à mesma franquia ou
+              universo de um dos filmes selecionados.
+              {jogo.explicacao?.justificativa
+                ? ` ${jogo.explicacao.justificativa}`
+                : ""}
             </Typography>
+          ) : (
+            jogo.explicacao && (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: cores.secundario,
+                  fontSize: "0.85rem",
+                  lineHeight: 1.65,
+                  overflowWrap: "anywhere",
+                }}
+              >
+                {jogo.explicacao.justificativa}
+              </Typography>
+            )
           )}
         </Box>
       </Box>
 
-      {/* TERMOS EM COMUM */}
-      {jogo.explicacao &&
-        jogo.explicacao.termos_em_comum.length > 0 && (
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 0.8,
-            }}
-          >
-            {jogo.explicacao.termos_em_comum.map(
-              (termo, index) => (
-                <Chip
-                  key={`${termo}-${index}`}
-                  label={termo}
-                  size="small"
-                  sx={{
-                    bgcolor: "#F1F2EF",
-                    color: "#555555",
-                    fontSize: "0.72rem",
-                    height: 25,
-                    borderRadius: "7px",
-                    border: "1px solid #E7E9E3",
-                  }}
-                />
-              )
-            )}
-          </Box>
-        )}
+      {/* TERMOS EM COMUM OU GÊNEROS */}
 
-      {/* AVALIAÇÃO DO USUÁRIO */}
+      {termosExibidos.length > 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 0.8,
+          }}
+        >
+          {termosExibidos.map((termo, index) => (
+            <Chip
+              key={`${termo}-${index}`}
+              label={termo}
+              size="small"
+              sx={{
+                bgcolor: ehFranquia
+                  ? "#F0F6FC"
+                  : "#F1F2EF",
+
+                color: ehFranquia
+                  ? "#27669C"
+                  : "#555555",
+
+                fontSize: "0.72rem",
+                height: 25,
+                borderRadius: "7px",
+
+                border: ehFranquia
+                  ? "1px solid #D6E8F7"
+                  : "1px solid #E7E9E3",
+              }}
+            />
+          ))}
+        </Box>
+      )}
+
+      {/* RODAPÉ */}
+
       <Box
         sx={{
           mt: "auto",
           pt: 1.5,
-          borderTop: "1px solid #EAEAEA",
+          borderTop: ehFranquia
+            ? "1px solid #D6E8F7"
+            : "1px solid #EAEAEA",
+
           display: "flex",
           alignItems: "center",
           justifyContent: "flex-end",
           minHeight: 42,
         }}
       >
-        <AvaliacaoUsuario
-          consultaId={consultaId}
-          jogo={jogo}
-        />
+        {/* AVALIAÇÃO APENAS NAS RECOMENDAÇÕES PRINCIPAIS */}
+
+        {!ehFranquia && consultaId !== undefined ? (
+          <AvaliacaoUsuario
+            consultaId={consultaId}
+            jogo={jogo}
+          />
+        ) : ehFranquia ? (
+          <Typography
+            variant="caption"
+            sx={{
+              color: cores.azul,
+              fontWeight: 600,
+            }}
+          >
+            Jogo da mesma franquia
+          </Typography>
+        ) : null}
       </Box>
     </Paper>
   );
