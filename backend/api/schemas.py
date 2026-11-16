@@ -83,3 +83,16 @@ class ConsultaHistoricoResponse(BaseModel):
     filmes_titulos: str
     franquias_detectadas: str | None
     criado_em: datetime
+
+class DetalhesJogoSteam(BaseModel):
+    game_id: int
+    name: str
+    type: str
+    description: str
+    header_image: str | None = None
+    developers: list[str] = Field(default_factory=list)
+    publishers: list[str] = Field(default_factory=list)
+    release_date: str = ""
+    genres: list[str] = Field(default_factory=list)
+    screenshots: list[str] = Field(default_factory=list)
+    store_url: str

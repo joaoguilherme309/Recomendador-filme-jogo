@@ -45,3 +45,17 @@ export interface FeedbackRequest {
   nota: number;
   relevante: boolean;
 }
+
+export interface DetalhesJogoSteam {
+  game_id: number;
+  name: string;
+  type: string;
+  description: string;
+  header_image: string | null;
+  developers: string[];
+  publishers: string[];
+  release_date: string;
+  genres: string[];
+  screenshots: string[];
+  store_url: string;
+}

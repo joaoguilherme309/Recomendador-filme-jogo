@@ -6,6 +6,7 @@ import {
   FilmeResumo,
   RecomendacaoRequest,
   RecomendacaoResponse,
+  DetalhesJogoSteam,
 } from "../types/recomendacao";
 
 // Configuração da comunicação com o FastAPI
@@ -49,4 +50,15 @@ export async function enviarFeedback(
   payload: FeedbackRequest
 ): Promise<void> {
   await api.post("/feedback", payload);
+}
+
+// Buscar detalhes de um jogo na Steam
+export async function buscarDetalhesJogo(
+  gameId: number
+): Promise<DetalhesJogoSteam> {
+  const { data } = await api.get<DetalhesJogoSteam>(
+    `/jogos/${gameId}`
+  );
+
+  return data;
 }
