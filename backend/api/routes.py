@@ -12,6 +12,8 @@ from backend.ml.modelo_recomendacao import (
     recomendar_jogos_por_perfil,
 )
 
+from backend.services.steam import buscar_detalhes_steam
+
 router = APIRouter(tags=["Recomendação"])
 
 
@@ -110,3 +112,29 @@ def endpoint_listar_historico(
         .limit(limite)
         .all()
     )
+
+@router.get(
+    "/jogos/{game_id}",
+    response_model=schemas.DetalhesJogoSteam,
+)
+def endpoint_detalhes_jogo(game_id: int):
+    if game_id <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de jogo inválido.",
+        )
+
+    try:
+        return buscar_detalhes_steam(game_id)
+
+    except LookupError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(erro),
+        ) from erro
+
+    except RuntimeError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=str(erro),
+        ) from erro
