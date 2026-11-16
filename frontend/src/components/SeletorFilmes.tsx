@@ -9,8 +9,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+
 import SearchIcon from "@mui/icons-material/Search";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+
 import { buscarFilmes } from "../services/api";
 import { FilmeResumo } from "../types/recomendacao";
 
@@ -28,6 +30,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
   const [termoBusca, setTermoBusca] = useState("");
   const [buscando, setBuscando] = useState(false);
 
+  // Busca de filmes na API
   useEffect(() => {
     const query = termoBusca.trim();
     let ativo = true;
@@ -43,11 +46,18 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
     const timer = setTimeout(async () => {
       try {
         const resultados = await buscarFilmes(query, 10);
-        if (ativo) setOpcoes(resultados);
+
+        if (ativo) {
+          setOpcoes(resultados);
+        }
       } catch {
-        if (ativo) setOpcoes([]);
+        if (ativo) {
+          setOpcoes([]);
+        }
       } finally {
-        if (ativo) setBuscando(false);
+        if (ativo) {
+          setBuscando(false);
+        }
       }
     }, 300);
 
@@ -72,6 +82,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
 
   return (
     <Box sx={{ width: "100%" }}>
+      {/* TÍTULO */}
       <Typography
         variant="h5"
         sx={{
@@ -93,6 +104,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
         Escolha de 2 a 3 filmes para começarmos.
       </Typography>
 
+      {/* CAMPO DE BUSCA */}
       <Autocomplete<FilmeResumo, true, false, false>
         multiple
         fullWidth
@@ -108,7 +120,10 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
         onInputChange={(_, novoTexto, reason) => {
           if (reason === "input") {
             setTermoBusca(novoTexto);
-          } else if (reason === "clear" || reason === "reset") {
+          } else if (
+            reason === "clear" ||
+            reason === "reset"
+          ) {
             setTermoBusca("");
           }
         }}
@@ -122,14 +137,45 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
             ? "Digite pelo menos 2 letras..."
             : "Nenhum filme encontrado"
         }
+        loadingText="Buscando filmes..."
+        openOnFocus={false}
         slotProps={{
           paper: {
             sx: {
               bgcolor: "#FFFFFF",
               color: "#171717",
               border: "1px solid #E5E5E5",
-              borderRadius: 2,
-              boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
+              borderRadius: "10px",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+              mt: 0.5,
+
+              "& .MuiAutocomplete-noOptions": {
+                color: "#777777",
+              },
+
+              "& .MuiAutocomplete-loading": {
+                color: "#777777",
+              },
+
+              "& .MuiAutocomplete-option": {
+                color: "#171717",
+                borderBottom: "1px solid #F1F1F1",
+              },
+
+              "& .MuiAutocomplete-option:hover": {
+                bgcolor: "#F5F8F4",
+              },
+
+              '& .MuiAutocomplete-option[aria-selected="true"]': {
+                bgcolor: "#E9EFE7",
+              },
+            },
+          },
+
+          listbox: {
+            sx: {
+              maxHeight: 250,
+              py: 0.5,
             },
           },
         }}
@@ -146,12 +192,17 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "flex-start !important",
+                px: 2,
                 py: 1.5,
+                cursor: "pointer",
               }}
             >
               <Typography
                 variant="body2"
-                sx={{ fontWeight: 600, color: "#171717" }}
+                sx={{
+                  fontWeight: 600,
+                  color: "#171717",
+                }}
               >
                 {option.title}
               </Typography>
@@ -159,7 +210,10 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
               {option.genres.length > 0 && (
                 <Typography
                   variant="caption"
-                  sx={{ color: "#777777" }}
+                  sx={{
+                    color: "#777777",
+                    mt: 0.3,
+                  }}
                 >
                   {option.genres.join(" • ")}
                 </Typography>
@@ -177,18 +231,26 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
             }
             InputProps={{
               ...params.InputProps,
+
               startAdornment: (
                 <>
                   <SearchIcon
-                    sx={{ color: "#858585", mr: 1 }}
+                    sx={{
+                      color: "#858585",
+                      mr: 1,
+                    }}
                   />
                   {params.InputProps.startAdornment}
                 </>
               ),
+
               endAdornment: (
                 <>
                   {buscando && (
-                    <CircularProgress size={18} />
+                    <CircularProgress
+                      size={18}
+                      sx={{ color: "#285C36" }}
+                    />
                   )}
                   {params.InputProps.endAdornment}
                 </>
@@ -199,21 +261,46 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
                 bgcolor: "#FFFFFF",
                 borderRadius: "10px",
                 minHeight: 56,
+                color: "#171717",
+
                 "& fieldset": {
                   borderColor: "#D9D9D9",
                 },
+
                 "&:hover fieldset": {
                   borderColor: "#879C88",
                 },
+
                 "&.Mui-focused fieldset": {
                   borderColor: "#285C36",
+                  borderWidth: "2px",
                 },
+              },
+
+              // CORREÇÃO DO TEXTO DIGITADO
+              "& .MuiInputBase-input": {
+                color: "#171717 !important",
+                WebkitTextFillColor: "#171717",
+                fontSize: "15px",
+              },
+
+              // CORREÇÃO DO PLACEHOLDER
+              "& .MuiInputBase-input::placeholder": {
+                color: "#858585 !important",
+                WebkitTextFillColor: "#858585",
+                opacity: 1,
+                fontSize: "15px",
+              },
+
+              "& .MuiAutocomplete-endAdornment .MuiIconButton-root": {
+                color: "#666666",
               },
             }}
           />
         )}
       />
 
+      {/* FILMES SELECIONADOS */}
       <Box
         sx={{
           display: "flex",
@@ -239,8 +326,10 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
               color: "#24492C",
               fontWeight: 500,
               borderRadius: "9px",
+
               "& .MuiChip-deleteIcon": {
                 color: "#52735A",
+
                 "&:hover": {
                   color: "#285C36",
                 },
@@ -250,6 +339,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
         ))}
       </Box>
 
+      {/* CONTADOR */}
       <Typography
         variant="caption"
         sx={{
@@ -262,6 +352,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
         (mínimo de 2)
       </Typography>
 
+      {/* BOTÃO DE RECOMENDAÇÃO */}
       <Box
         sx={{
           borderTop: "1px solid #EAEAEA",
@@ -294,9 +385,15 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
             textTransform: "none",
             fontWeight: 600,
             boxShadow: "none",
+
             "&:hover": {
               bgcolor: "#1D4629",
               boxShadow: "none",
+            },
+
+            "&.Mui-disabled": {
+              bgcolor: "#E9E9E9",
+              color: "#999999",
             },
           }}
         >

@@ -1,0 +1,92 @@
+[
+  {
+    "arquetipo": "Fantasia Medieval e Épica",
+    "filmes_treino": [
+      "Spider-Man 3",
+      "Muppet Treasure Island"
+    ],
+    "filme_teste_oculto": "Aquaman",
+    "top5_recomendados": [
+      {
+        "jogo": "打豹虎 Spider Derby",
+        "relevante_ground_truth": false
+      },
+      {
+        "jogo": "Jim's Adventure",
+        "relevante_ground_truth": false
+      },
+      {
+        "jogo": "Marvel’s Spider-Man Remastered",
+        "relevante_ground_truth": false
+      },
+      {
+        "jogo": "Don't Wake Grandpa",
+        "relevante_ground_truth": false
+      },
+      {
+        "jogo": "Man of Sterling Quality",
+        "relevante_ground_truth": false
+      }
+    ]
+  },
+  {
+    "arquetipo": "Ficção Científica e Espaço",
+    "filmes_treino": [
+      "Ring 2",
+      "The Man from Earth"
+    ],
+    "filme_teste_oculto": "DC League of Super-Pets",
+    "top5_recomendados": [
+      {
+        "jogo": "Better Boyfriend",
+        "relevante_ground_truth": false
+      },
+      {
+        "jogo": "Girlfriend from Hell",
+        "relevante_ground_truth": false
+      },
+      {
+        "jogo": "Psychonauts",
+        "relevante_ground_truth": false
+      },
+      {
+        "jogo": "That Which Binds Us",
+        "relevante_ground_truth": false
+      },
+      {
+        "jogo": "Love Is In The Space",
+        "relevante_ground_truth": false
+      }
+    ]
+  },
+  {
+    "arquetipo": "Terror e Sobrevivência",
+    "filmes_treino": [
+      "The Hills Have Eyes",
+      "Night of the Demons"
+    ],
+    "filme_teste_oculto": "Body Cam",
+    "top5_recomendados": [
+      {
+        "jogo": "Kevurah Horror Tale",
+        "relevante_ground_truth": false
+      },
+      {
+        "jogo": "Halloween Trouble 3: Match 3 Puzzle",
+        "relevante_ground_truth": false
+      },
+      {
+        "jogo": "Hallowed Encounter",
+        "relevante_ground_truth": false
+      },
+      {
+        "jogo": "Funeral",
+        "relevante_ground_truth": false
+      },
+      {
+        "jogo": "Sweet Holiday Jigsaws: Halloween Night",
+        "relevante_ground_truth": false
+      }
+    ]
+  }
+]

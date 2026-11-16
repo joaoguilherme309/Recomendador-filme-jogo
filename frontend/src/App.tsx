@@ -1,5 +1,6 @@
 
 import React, { useRef, useState } from "react";
+
 import {
   Alert,
   Box,
@@ -20,6 +21,7 @@ import { ListaFranquias } from "./components/ListaFranquias";
 import { SeletorFilmes } from "./components/SeletorFilmes";
 import { TelaLoginMockup } from "./components/TelaLogin";
 import { gerarRecomendacoes } from "./services/api";
+
 import {
   FilmeResumo,
   RecomendacaoResponse,
@@ -39,9 +41,9 @@ export const App: React.FC = () => {
   const [exibirLoginMockup, setExibirLoginMockup] =
     useState(false);
 
-  const [historico, setHistorico] = useState<
-    RecomendacaoResponse[]
-  >([]);
+  // Armazena apenas a consulta mais recente
+  const [ultimaConsulta, setUltimaConsulta] =
+    useState<RecomendacaoResponse | null>(null);
 
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -60,7 +62,8 @@ export const App: React.FC = () => {
         top_n: 10,
       });
 
-      setHistorico((prev) => [...prev, resposta]);
+      // Substitui os resultados anteriores pela nova consulta
+      setUltimaConsulta(resposta);
 
       setTimeout(() => {
         resultadosRef.current?.scrollIntoView({
@@ -69,8 +72,9 @@ export const App: React.FC = () => {
         });
       }, 100);
     } catch {
+      // Mantém a consulta anterior em caso de falha
       setErro(
-        "Não foi possível conectar à API. Verifique se o servidor FastAPI está em execução na porta 8000."
+        "Não foi possível gerar as recomendações. Verifique se o servidor FastAPI está em execução na porta 8000."
       );
     } finally {
       setCarregando(false);
@@ -84,11 +88,6 @@ export const App: React.FC = () => {
       />
     );
   }
-
-  const ultimaConsulta =
-    historico.length > 0
-      ? historico[historico.length - 1]
-      : null;
 
   return (
     <Box
@@ -374,6 +373,7 @@ export const App: React.FC = () => {
                   sx={{
                     mt: 2,
                     bgcolor: cores.verde,
+                    color: "#FFFFFF",
                     textTransform: "none",
                     borderRadius: 2,
                     boxShadow: "none",
@@ -401,9 +401,9 @@ export const App: React.FC = () => {
                 {[
                   {
                     numero: "01",
-                    titulo: "Escolha seu filmes",
+                    titulo: "Escolha seus filmes",
                     descricao:
-                      "Selecione um filme que você gosta.",
+                      "Selecione de 2 a 3 filmes que você gosta.",
                   },
                   {
                     numero: "02",
@@ -471,8 +471,8 @@ export const App: React.FC = () => {
           </Alert>
         )}
 
-        {/* RESULTADOS DA API */}
-        {historico.length > 0 && (
+        {/* RESULTADOS DA ÚLTIMA CONSULTA */}
+        {ultimaConsulta && (
           <Box
             ref={resultadosRef}
             sx={{
@@ -500,73 +500,74 @@ export const App: React.FC = () => {
               nos filmes que você escolheu.
             </Typography>
 
-            {historico.map((item, consultaIndex) => (
-              <Box
-                key={item.consulta_id}
-                sx={{ mb: 7 }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    flexWrap: "wrap",
-                    mb: 3,
-                  }}
-                >
-                  <MovieOutlinedIcon
-                    sx={{ color: cores.verde }}
+            {/* FILMES DA CONSULTA ATUAL */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                flexWrap: "wrap",
+                mb: 3,
+              }}
+            >
+              <MovieOutlinedIcon
+                sx={{ color: cores.verde }}
+              />
+
+              <Typography sx={{ fontWeight: 600 }}>
+                Filmes selecionados:
+              </Typography>
+
+              {ultimaConsulta.filmes_selecionados.map(
+                (filme) => (
+                  <Chip
+                    key={filme.movie_id}
+                    label={filme.title}
+                    size="small"
+                    sx={{
+                      bgcolor: cores.verdeClaro,
+                      color: cores.verde,
+                    }}
                   />
+                )
+              )}
+            </Box>
 
-                  <Typography sx={{ fontWeight: 600 }}>
-                    Consulta {consultaIndex + 1}
-                  </Typography>
+            {/* 10 CARDS DA CONSULTA ATUAL */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  md: "repeat(2, minmax(0, 1fr))",
+                },
+                gap: 2,
+              }}
+            >
+              {ultimaConsulta.recomendacoes.map(
+                (jogo, idx) => (
+                  <Box key={jogo.game_id}>
+                    <CardJogo
+                      posicao={idx + 1}
+                      jogo={jogo}
+                      consultaId={ultimaConsulta.consulta_id}
+                    />
+                  </Box>
+                )
+              )}
+            </Box>
 
-                  {item.filmes_selecionados.map(
-                    (filme) => (
-                      <Chip
-                        key={filme.movie_id}
-                        label={filme.title}
-                        size="small"
-                        sx={{
-                          bgcolor: cores.verdeClaro,
-                          color: cores.verde,
-                        }}
-                      />
-                    )
-                  )}
-                </Box>
+            {/* FRANQUIAS IDENTIFICADAS */}
+            <Box sx={{ mt: 3 }}>
+              <ListaFranquias
+                franquias={
+                  ultimaConsulta.franquias_identificadas
+                }
+                jogos={ultimaConsulta.jogos_franquia}
+              />
+            </Box>
 
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: {
-                      xs: "1fr",
-                      md: "repeat(2, minmax(0, 1fr))",
-                    },
-                    gap: 2,
-                  }}
-                >
-                  {item.recomendacoes.map((jogo, idx) => (
-                    <Box key={jogo.game_id}>
-                      <CardJogo
-                        posicao={idx + 1}
-                        jogo={jogo}
-                        consultaId={item.consulta_id}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-
-                <Box sx={{ mt: 3 }}>
-                  <ListaFranquias
-                    franquias={item.franquias_identificadas}
-                    jogos={item.jogos_franquia}
-                  />
-                </Box>
-              </Box>
-            ))}
-
+            {/* VOLTAR AO SELETOR */}
             <Button
               startIcon={<ArrowBackIcon />}
               onClick={() =>
@@ -576,6 +577,7 @@ export const App: React.FC = () => {
                 })
               }
               sx={{
+                mt: 3,
                 color: cores.verde,
                 textTransform: "none",
                 fontWeight: 600,

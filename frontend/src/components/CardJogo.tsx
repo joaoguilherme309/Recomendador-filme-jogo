@@ -1,8 +1,7 @@
-// Função no sistema: Exibir um jogo recomendado com imagem de capa, percentual de
-// compatibilidade, explicação gerada pelo modelo TF-IDF e botões de avaliação.
 
 import React from "react";
 import { Box, Chip, Paper, Typography } from "@mui/material";
+
 import { JogoRecomendado } from "../types/recomendacao";
 import { AvaliacaoUsuario } from "./AvaliacaoUsuario";
 
@@ -12,79 +11,286 @@ interface CardJogoProps {
   consultaId: number;
 }
 
-export const CardJogo: React.FC<CardJogoProps> = ({ posicao, jogo, consultaId }) => {
+// Identidade visual do CineGame Recommender
+const cores = {
+  branco: "#FFFFFF",
+  texto: "#171717",
+  secundario: "#666666",
+  verde: "#285C36",
+  verdeClaro: "#E9EFE7",
+  borda: "#E7E5E1",
+};
+
+// Define a aparência de cada posição do ranking
+const obterEstiloRanking = (posicao: number) => {
+  switch (posicao) {
+    case 1:
+      return {
+        borda: "#D4AF37",
+        fundo: "#FFFCF3",
+        selo: "Recomendado",
+        seloFundo: "#FFF0BF",
+        seloTexto: "#806000",
+        medalha: "🥇",
+      };
+
+    case 2:
+      return {
+        borda: "#B7BEC8",
+        fundo: "#FAFBFC",
+        selo: "Recomendado",
+        seloFundo: "#E8ECF0",
+        seloTexto: "#53606D",
+        
+      };
+
+    case 3:
+      return {
+        borda: "#CD7F32",
+        fundo: "#FFF9F4",
+        selo: "Recomendado",
+        seloFundo: "#FBE6D3",
+        seloTexto: "#8A4F1D",
+        
+      };
+
+    default:
+      return {
+        borda: cores.borda,
+        fundo: cores.branco,
+        selo: null,
+        seloFundo: cores.verdeClaro,
+        seloTexto: cores.verde,
+        medalha: null,
+      };
+  }
+};
+
+export const CardJogo: React.FC<CardJogoProps> = ({
+  posicao,
+  jogo,
+  consultaId,
+}) => {
+  const ranking = obterEstiloRanking(posicao);
+
   return (
     <Paper
       elevation={0}
       sx={{
-        bgcolor: "#111111",
-        border: "1px solid #242424",
-        borderRadius: 3,
-        p: 2,
+        bgcolor: ranking.fundo,
+        border: `2px solid ${ranking.borda}`,
+        borderRadius: "16px",
+        p: { xs: 2, sm: 2.5 },
         display: "flex",
+        flexDirection: "column",
         gap: 2,
-        alignItems: "center",
-        flexWrap: { xs: "wrap", sm: "nowrap" },
+        height: "100%",
+        boxSizing: "border-box",
+        boxShadow:
+          posicao <= 3
+            ? "0 5px 20px rgba(0,0,0,0.055)"
+            : "0 3px 12px rgba(0,0,0,0.035)",
+        transition:
+          "transform 0.2s ease, box-shadow 0.2s ease",
+
+        "&:hover": {
+          transform: "translateY(-3px)",
+          boxShadow: "0 8px 26px rgba(0,0,0,0.09)",
+        },
       }}
     >
-      {jogo.header_image && (
+      {/* SELO DO RANKING */}
+      {ranking.selo && (
         <Box
-          component="img"
-          src={jogo.header_image}
-          alt={jogo.name}
           sx={{
-            width: { xs: "100%", sm: 150 },
-            height: 72,
-            objectFit: "cover",
-            borderRadius: 2,
-            flexShrink: 0,
+            display: "flex",
+            justifyContent: "flex-start",
           }}
-        />
+        >
+          <Box
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.7,
+              bgcolor: ranking.seloFundo,
+              color: ranking.seloTexto,
+              px: 1.4,
+              py: 0.6,
+              borderRadius: "20px",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+            }}
+          >
+            <span>{ranking.medalha}</span>
+            {ranking.selo}
+          </Box>
+        </Box>
       )}
 
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
-          <Typography variant="subtitle1" sx={{ color: "#ffffff", fontWeight: 600 }}>
-            {posicao}. {jogo.name}
-          </Typography>
-          <Chip
-            label={`${(jogo.similaridade * 100).toFixed(1)}% compatível`}
-            size="small"
+      {/* IMAGEM E INFORMAÇÕES PRINCIPAIS */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: {
+            xs: "column",
+            sm: "row",
+          },
+          alignItems: "flex-start",
+          gap: 2,
+        }}
+      >
+        {/* CAPA DO JOGO */}
+        {jogo.header_image ? (
+          <Box
+            component="img"
+            src={jogo.header_image}
+            alt={`Imagem do jogo ${jogo.name}`}
+            loading="lazy"
             sx={{
-              bgcolor: "#1c2b21",
-              color: "#6ee7b7",
-              fontSize: "0.72rem",
-              height: 22,
+              width: {
+                xs: "100%",
+                sm: 165,
+              },
+              height: {
+                xs: 150,
+                sm: 105,
+              },
+              objectFit: "cover",
+              borderRadius: "10px",
+              flexShrink: 0,
+              border: "1px solid #EAEAEA",
             }}
           />
-        </Box>
-
-        {jogo.explicacao && (
-          <Typography variant="body2" sx={{ color: "#a3a3a3", mt: 0.6, fontSize: "0.85rem" }}>
-            {jogo.explicacao.justificativa}
-          </Typography>
-        )}
-
-        {jogo.explicacao && jogo.explicacao.termos_em_comum.length > 0 && (
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.6, mt: 1 }}>
-            {jogo.explicacao.termos_em_comum.map((termo) => (
-              <Chip
-                key={termo}
-                label={termo}
-                size="small"
-                sx={{
-                  bgcolor: "#1c1c1c",
-                  color: "#bdbdbd",
-                  fontSize: "0.7rem",
-                  height: 20,
-                }}
-              />
-            ))}
+        ) : (
+          <Box
+            sx={{
+              width: {
+                xs: "100%",
+                sm: 165,
+              },
+              height: {
+                xs: 150,
+                sm: 105,
+              },
+              bgcolor: "#F0F0F0",
+              borderRadius: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{ color: "#888888" }}
+            >
+              Imagem indisponível
+            </Typography>
           </Box>
         )}
+
+        {/* DADOS DO JOGO */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            width: "100%",
+          }}
+        >
+          {/* NOME DO JOGO */}
+          <Typography
+            variant="subtitle1"
+            sx={{
+              color: cores.texto,
+              fontWeight: 700,
+              fontSize: "1rem",
+              lineHeight: 1.4,
+              overflowWrap: "anywhere",
+              mb: 1,
+            }}
+          >
+            {posicao}. {jogo.name}
+          </Typography>
+
+          {/* PONTUAÇÃO DE SIMILARIDADE */}
+          <Chip
+            label={`${(jogo.similaridade * 100).toFixed(1)}% de similaridade`}
+            size="small"
+            sx={{
+              bgcolor: cores.verdeClaro,
+              color: cores.verde,
+              fontWeight: 700,
+              fontSize: "0.72rem",
+              borderRadius: "7px",
+              height: 26,
+              mb: 1.5,
+            }}
+          />
+
+          {/* EXPLICAÇÃO DO MODELO */}
+          {jogo.explicacao && (
+            <Typography
+              variant="body2"
+              sx={{
+                color: cores.secundario,
+                fontSize: "0.85rem",
+                lineHeight: 1.65,
+                overflowWrap: "anywhere",
+              }}
+            >
+              {jogo.explicacao.justificativa}
+            </Typography>
+          )}
+        </Box>
       </Box>
 
-      <AvaliacaoUsuario consultaId={consultaId} jogo={jogo} />
+      {/* TERMOS EM COMUM */}
+      {jogo.explicacao &&
+        jogo.explicacao.termos_em_comum.length > 0 && (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 0.8,
+            }}
+          >
+            {jogo.explicacao.termos_em_comum.map(
+              (termo, index) => (
+                <Chip
+                  key={`${termo}-${index}`}
+                  label={termo}
+                  size="small"
+                  sx={{
+                    bgcolor: "#F1F2EF",
+                    color: "#555555",
+                    fontSize: "0.72rem",
+                    height: 25,
+                    borderRadius: "7px",
+                    border: "1px solid #E7E9E3",
+                  }}
+                />
+              )
+            )}
+          </Box>
+        )}
+
+      {/* AVALIAÇÃO DO USUÁRIO */}
+      <Box
+        sx={{
+          mt: "auto",
+          pt: 1.5,
+          borderTop: "1px solid #EAEAEA",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          minHeight: 42,
+        }}
+      >
+        <AvaliacaoUsuario
+          consultaId={consultaId}
+          jogo={jogo}
+        />
+      </Box>
     </Paper>
   );
 };
