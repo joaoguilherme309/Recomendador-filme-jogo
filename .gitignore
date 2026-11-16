@@ -8,8 +8,8 @@ frontend/dist/*
 __pycache__/
 *.pyc
 
-# Datasets
-data/
+# Datasets (a barra inicial limita à pasta data/ da raiz; sem ela, frontend/src/data/ também era ignorada)
+/data/
 steam-games-dataset-main/
 tmdb_top_10k_movies_2026.csv.csv
 
