@@ -1,3 +1,5 @@
+// frontend/src/data/exemplosTransmutacao.ts
+
 // Função no sistema: Fornecer os exemplos estáticos exibidos no carrossel do
 // CabecalhoTransmutacao (um filme de origem e três jogos relacionados por exemplo).
 // As imagens ficam em frontend/public/imagens/ e são servidas a partir da raiz ("/").

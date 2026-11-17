@@ -1,3 +1,4 @@
+// SeletorFilmes.tsx
 
 import React, { useEffect, useState } from "react";
 
@@ -100,7 +101,8 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
         variant="h5"
         sx={{
           fontWeight: 700,
-          color: "#171717",
+          fontSize: 17,
+          color: "#E6EDF3",
           mb: 1,
         }}
       >
@@ -110,7 +112,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
       <Typography
         variant="body2"
         sx={{
-          color: "#6B6B6B",
+          color: "#A7B8C8",
           mb: 3,
         }}
       >
@@ -189,32 +191,32 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
         slotProps={{
           paper: {
             sx: {
-              bgcolor: "#FFFFFF",
-              color: "#171717",
-              border: "1px solid #E5E5E5",
-              borderRadius: "10px",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+              bgcolor: "#1B2A3A",
+              color: "#DCE5ED",
+              border: "1px solid #34485B",
+              borderRadius: "4px",
+              boxShadow: "0 12px 28px rgba(10,25,40,0.22)",
               mt: 0.5,
 
               "& .MuiAutocomplete-noOptions": {
-                color: "#777777",
+                color: "#A9B8C5",
               },
 
               "& .MuiAutocomplete-loading": {
-                color: "#777777",
+                color: "#A9B8C5",
               },
 
               "& .MuiAutocomplete-option": {
-                color: "#171717",
-                borderBottom: "1px solid #F1F1F1",
+                color: "#DCE5ED",
+                borderBottom: "1px solid #2B3D4F",
               },
 
               "& .MuiAutocomplete-option:hover": {
-                bgcolor: "#F5F8F4",
+                bgcolor: "#2A4055",
               },
 
               '& .MuiAutocomplete-option[aria-selected="true"]': {
-                bgcolor: "#E9EFE7",
+                bgcolor: "#314B62",
               },
             },
           },
@@ -252,7 +254,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
                 variant="body2"
                 sx={{
                   fontWeight: 600,
-                  color: "#171717",
+                  color: "#E6EDF3",
                 }}
               >
                 {option.title}
@@ -262,7 +264,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
                 <Typography
                   variant="caption"
                   sx={{
-                    color: "#777777",
+                    color: "#A9B8C5",
                     mt: 0.3,
                   }}
                 >
@@ -289,7 +291,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
                 <>
                   <SearchIcon
                     sx={{
-                      color: "#858585",
+                      color: "#91A4B7",
                       mr: 1,
                     }}
                   />
@@ -303,7 +305,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
                   {buscando && (
                     <CircularProgress
                       size={18}
-                      sx={{ color: "#285C36" }}
+                      sx={{ color: "#66C0F4" }}
                     />
                   )}
 
@@ -314,40 +316,40 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
 
             sx={{
               "& .MuiOutlinedInput-root": {
-                bgcolor: "#FFFFFF",
-                borderRadius: "10px",
-                minHeight: 56,
-                color: "#171717",
+                bgcolor: "#26394B",
+                borderRadius: "4px",
+                minHeight: 54,
+                color: "#E6EDF3",
 
                 "& fieldset": {
-                  borderColor: "#D9D9D9",
+                  borderColor: "#506477",
                 },
 
                 "&:hover fieldset": {
-                  borderColor: "#879C88",
+                  borderColor: "#78A6C9",
                 },
 
                 "&.Mui-focused fieldset": {
-                  borderColor: "#285C36",
+                  borderColor: "#66A5D2",
                   borderWidth: "2px",
                 },
               },
 
               "& .MuiInputBase-input": {
-                color: "#171717 !important",
-                WebkitTextFillColor: "#171717",
+                color: "#E6EDF3 !important",
+                WebkitTextFillColor: "#E6EDF3",
                 fontSize: "15px",
               },
 
               "& .MuiInputBase-input::placeholder": {
-                color: "#858585 !important",
-                WebkitTextFillColor: "#858585",
+                color: "#A9B8C5 !important",
+                WebkitTextFillColor: "#A9B8C5",
                 opacity: 1,
                 fontSize: "15px",
               },
 
               "& .MuiAutocomplete-endAdornment .MuiIconButton-root": {
-                color: "#666666",
+                color: "#B4C1CC",
               },
             }}
           />
@@ -377,16 +379,16 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
               )
             }
             sx={{
-              bgcolor: "#E9EFE7",
-              color: "#24492C",
+              bgcolor: "#314B62",
+              color: "#E6EDF3",
               fontWeight: 500,
-              borderRadius: "9px",
+              borderRadius: "3px",
 
               "& .MuiChip-deleteIcon": {
-                color: "#52735A",
+                color: "#9BBAD2",
 
                 "&:hover": {
-                  color: "#285C36",
+                  color: "#D6E8F5",
                 },
               },
             }}
@@ -400,7 +402,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
         variant="caption"
         sx={{
           display: "block",
-          color: "#858585",
+          color: "#91A4B7",
           mt: 1,
         }}
       >
@@ -412,7 +414,7 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
 
       <Box
         sx={{
-          borderTop: "1px solid #EAEAEA",
+          borderTop: "1px solid #34495E",
           mt: 3,
           pt: 2.5,
           display: "flex",
@@ -434,23 +436,23 @@ export const SeletorFilmes: React.FC<SeletorFilmesProps> = ({
           disabled={!podeEnviar}
           onClick={handleEnviar}
           sx={{
-            bgcolor: "#285C36",
+            bgcolor: "#D6E8F5",
             color: "#FFFFFF",
             px: 3,
             py: 1.4,
-            borderRadius: "10px",
+            borderRadius: "2px",
             textTransform: "none",
             fontWeight: 600,
             boxShadow: "none",
 
             "&:hover": {
-              bgcolor: "#1D4629",
+              bgcolor: "#285477",
               boxShadow: "none",
             },
 
             "&.Mui-disabled": {
-              bgcolor: "#E9E9E9",
-              color: "#999999",
+              bgcolor: "#34495E",
+              color: "#A7B8C8",
             },
           }}
         >

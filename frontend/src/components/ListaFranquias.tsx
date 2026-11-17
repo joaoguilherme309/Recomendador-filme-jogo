@@ -1,3 +1,4 @@
+// ListaFranquias.tsx
 
 import React from "react";
 
@@ -17,19 +18,21 @@ import { CardJogo } from "./CardJogo";
 interface ListaFranquiasProps {
   franquias: string[];
   jogos: JogoRecomendado[];
+  consultaId: number;
 }
 
 const cores = {
-  texto: "#171717",
-  secundario: "#666666",
-  azul: "#3283CE",
-  azulClaro: "#EAF4FF",
-  borda: "#E7E5E1",
+  texto: "#E6EDF3",
+  secundario: "#A7B8C8",
+  azul: "#66C0F4",
+  azulClaro: "#31485F",
+  borda: "#34495E",
 };
 
 export const ListaFranquias: React.FC<ListaFranquiasProps> = ({
   franquias,
   jogos,
+  consultaId,
 }) => {
   if (!jogos || jogos.length === 0) {
     return null;
@@ -42,7 +45,7 @@ export const ListaFranquias: React.FC<ListaFranquiasProps> = ({
       <Divider
         sx={{
           borderColor: cores.borda,
-          mb: 4,
+          mb: 2.5,
         }}
       />
 
@@ -60,7 +63,7 @@ export const ListaFranquias: React.FC<ListaFranquiasProps> = ({
           <SportsEsportsOutlinedIcon
             sx={{
               color: cores.azul,
-              fontSize: 30,
+              fontSize: 24,
             }}
           />
 
@@ -69,6 +72,7 @@ export const ListaFranquias: React.FC<ListaFranquiasProps> = ({
             sx={{
               fontWeight: 750,
               color: cores.texto,
+              fontSize: 20,
             }}
           >
             Jogos da mesma franquia
@@ -78,8 +82,9 @@ export const ListaFranquias: React.FC<ListaFranquiasProps> = ({
         <Typography
           sx={{
             color: cores.secundario,
-            lineHeight: 1.7,
-            mb: 2,
+            lineHeight: 1.6,
+            mb: 1.5,
+            fontSize: 13,
           }}
         >
           Além das recomendações personalizadas,
@@ -111,6 +116,7 @@ export const ListaFranquias: React.FC<ListaFranquiasProps> = ({
                 fontWeight: 600,
                 color: cores.texto,
                 mr: 0.5,
+                fontSize: 12,
               }}
             >
               Franquias identificadas:
@@ -125,7 +131,8 @@ export const ListaFranquias: React.FC<ListaFranquiasProps> = ({
                   bgcolor: cores.azulClaro,
                   color: cores.azul,
                   fontWeight: 600,
-                  borderRadius: "8px",
+                  borderRadius: "0px",
+                  border: "1px solid #405A70",
                 }}
               />
             ))}
@@ -154,6 +161,7 @@ export const ListaFranquias: React.FC<ListaFranquiasProps> = ({
           >
             <CardJogo
               jogo={jogo}
+              consultaId={consultaId}
               variante="franquia"
             />
           </Box>
