@@ -28,3 +28,4 @@ joblib==1.6.0
 
 # Avaliação e Visualização de Resultados
 matplotlib==3.11.2
+tabulate==0.10.0
