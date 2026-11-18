@@ -37,28 +37,27 @@ SINONIMOS = {
     "ninja": "feudal_japan",
     "martial arts": "martial_arts",
     "anime": "jrpg",
+    "souls-like": "soulslike",
 }
 
 # Regras que conectam palavras-chave de sinopses de filmes a subgêneros de jogos
 PONTE_TEMATICA = {
-    "ring": ["fantasy", "medieval", "rpg", "open_world"],
-    "hobbit": ["fantasy", "medieval", "rpg"],
-    "wizard": ["fantasy", "magic", "rpg"],
-    "sorcerer": ["fantasy", "magic", "rpg"],
-    "dragon": ["fantasy", "medieval", "rpg", "dark_fantasy"],
-    "sword": ["medieval", "action_rpg", "hack_and_slash"],
-    "knight": ["medieval", "dark_fantasy", "soulslike"],
-    "curse": ["dark_fantasy", "soulslike"],
-    "gothic": ["dark_fantasy", "soulslike", "horror"],
-    "space": ["space", "science_fiction", "exploration"],
-    "galaxy": ["space", "science_fiction"],
-    "alien": ["space", "science_fiction", "survival"],
-    "zombie": ["zombie", "survival", "horror"],
-    "heist": ["stealth", "crime"],
-    "assassin": ["stealth", "action"],
-    "detective": ["detective", "mystery", "investigation"],
+    "hobbit": ({"fantasy"}, ["fantasy", "medieval", "rpg"]),
+    "wizard":    ({"fantasy"}, ["fantasy", "magic", "rpg"]),
+    "sorcerer":  ({"fantasy"}, ["fantasy", "magic", "rpg"]),
+    "dragon":    ({"fantasy", "animation"}, ["fantasy", "rpg"]),
+    "sword":     ({"fantasy", "action", "history"}, ["medieval", "action_rpg", "hack_and_slash"]),
+    "knight":    ({"fantasy", "history"}, ["medieval", "dark_fantasy"]),
+    "curse":     ({"fantasy", "horror"}, ["dark_fantasy"]),
+    "gothic":    ({"horror", "fantasy"}, ["dark_fantasy", "horror"]),
+    "space":     ({"science_fiction"}, ["space", "science_fiction", "exploration"]),
+    "galaxy":    ({"science_fiction"}, ["space", "science_fiction"]),
+    "alien":     ({"science_fiction", "horror"}, ["space", "science_fiction", "survival"]),
+    "zombie":    ({"horror", "comedy", "action"}, ["zombie", "survival", "horror"]),
+    "heist":     ({"crime", "thriller", "action"}, ["stealth", "crime"]),
+    "assassin":  ({"action", "thriller", "crime"}, ["stealth", "action"]),
+    "detective": ({"mystery", "crime", "thriller"}, ["detective", "mystery", "investigation"]),
 }
-
 
 def normalizar_termo(termo):
     if not isinstance(termo, str):
@@ -94,10 +93,12 @@ def limpar_e_lematizar(texto):
 
 
 def expandir_temas_filme(generos_padronizados, texto_limpo):
+    generos = set(generos_padronizados)
+    palavras = set(texto_limpo.split())
     extras = []
-    for palavra in texto_limpo.split():
-        if palavra in PONTE_TEMATICA:
-            extras.extend(PONTE_TEMATICA[palavra])
+    for palavra, (generos_exigidos, temas) in PONTE_TEMATICA.items():
+        if palavra in palavras and generos & generos_exigidos:
+            extras.extend(temas)
     return list(dict.fromkeys(generos_padronizados + extras))
 
 
